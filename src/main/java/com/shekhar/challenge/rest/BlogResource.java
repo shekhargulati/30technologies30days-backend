@@ -46,7 +46,7 @@ public class BlogResource {
     @Consumes(value = MediaType.APPLICATION_JSON)
     public Response create(Blog blog) {
         BasicDBObjectBuilder basicDBObjectBuilder = BasicDBObjectBuilder.start("title", blog.getTitle()).add("url",
-                blog.getUrl());
+                blog.getUrl()).add("publishedOn", blog.getPublishedOn());
         DBCollection collection = db.getCollection("blogs");
         collection.save(basicDBObjectBuilder.get());
         return Response.created(null).build();
