@@ -29,7 +29,7 @@ public class BlogResource {
     @GET
     @Produces(value = MediaType.APPLICATION_JSON)
     public List<Blog> timeline() {
-        DBCursor dbCursor = db.getCollection("blogs").find();
+        DBCursor dbCursor = db.getCollection("blogs").find().sort(new BasicDBObject("publishedOn", -1)).limit(30);
         List<Blog> blogs = new ArrayList<Blog>();
         while (dbCursor.hasNext()) {
             BasicDBObject dbObject = (BasicDBObject)dbCursor.next();
