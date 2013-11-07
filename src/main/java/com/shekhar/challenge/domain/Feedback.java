@@ -8,11 +8,10 @@ public class Feedback {
     private String name;
     private String description;
     private Date receivedOn = new Date();
+    private double[] lngLat;
     
     public Feedback() {
     }
-    
-    
 
     public Feedback(String id, String name, String description, Date receivedOn) {
         super();
@@ -56,6 +55,11 @@ public class Feedback {
         this.receivedOn = receivedOn;
     }
     
+    public void setLngLat(double[] lngLat) {
+        this.lngLat = lngLat;
+    }
     
-
+    public double[] getLngLat() {
+        return lngLat;
+    }
 }

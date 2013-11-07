@@ -22,7 +22,7 @@ public class FeedbackResource {
     @Consumes(value = MediaType.APPLICATION_JSON)
     public Response create(Feedback feedback) {
         BasicDBObjectBuilder basicDBObjectBuilder = BasicDBObjectBuilder.start("name", feedback.getName())
-                .add("description", feedback.getDescription()).add("receivedOn", feedback.getReceivedOn());
+                .add("description", feedback.getDescription()).add("receivedOn", feedback.getReceivedOn()).add("lngLat", feedback.getLngLat());
         DBCollection collection = db.getCollection("feedback");
         collection.save(basicDBObjectBuilder.get());
         return Response.created(null).build();
