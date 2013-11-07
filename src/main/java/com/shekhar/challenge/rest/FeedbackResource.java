@@ -25,6 +25,6 @@ public class FeedbackResource {
                 .add("description", feedback.getDescription()).add("receivedOn", feedback.getReceivedOn()).add("lngLat", feedback.getLngLat());
         DBCollection collection = db.getCollection("feedback");
         collection.save(basicDBObjectBuilder.get());
-        return Response.created(null).build();
+        return Response.ok().build();
     }
 }
