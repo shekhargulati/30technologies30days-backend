@@ -54,7 +54,7 @@ public class BlogResource {
         BasicDBObjectBuilder basicDBObjectBuilder = BasicDBObjectBuilder.start("title", blog.getTitle())
                 .add("url", blog.getUrl()).add("publishedOn", blog.getPublishedOn());
 
-        String authHeader = request.getHeader("user");
+        String authHeader = request.getHeader("authorization");
         System.out.println("user header " + authHeader);
         Enumeration<String> headerNames = request.getHeaderNames();
         while(headerNames.hasMoreElements()){
