@@ -1,3 +1,7 @@
-The OpenShift `jbosseap` cartridge documentation can be found at:
+## 30technologies30days Mobile Backend#
 
-https://github.com/openshift/origin-server/tree/master/cartridges/openshift-origin-cartridge-jbosseap/README.md
+To create the application run the following command.
+
+```
+$ rhc create-app t jbosseap mongodb-2.2 --from-code https://github.com/shekhargulati/30technologies30days-backend.git
+```
