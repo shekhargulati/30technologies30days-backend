@@ -54,6 +54,8 @@ public class BlogResource {
                 .add("url", blog.getUrl()).add("publishedOn", blog.getPublishedOn());
 
         String authHeader = request.getHeader("user");
+        System.out.println("user header " + authHeader);
+        System.out.println(request.getHeaderNames());
         if (authHeader != null) {
             String[] arr = authHeader.split(":");
             String username = arr[0];
