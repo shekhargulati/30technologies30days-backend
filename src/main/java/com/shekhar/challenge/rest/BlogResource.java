@@ -2,6 +2,7 @@ package com.shekhar.challenge.rest;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -55,7 +56,10 @@ public class BlogResource {
 
         String authHeader = request.getHeader("user");
         System.out.println("user header " + authHeader);
-        System.out.println(request.getHeaderNames());
+        Enumeration<String> headerNames = request.getHeaderNames();
+        while(headerNames.hasMoreElements()){
+            System.out.println(headerNames.nextElement());
+        }
         if (authHeader != null) {
             String[] arr = authHeader.split(":");
             String username = arr[0];
