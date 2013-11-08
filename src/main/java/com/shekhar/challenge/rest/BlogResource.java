@@ -1,11 +1,10 @@
 package com.shekhar.challenge.rest;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -21,10 +20,13 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.xml.bind.DatatypeConverter;
 
-import org.jboss.aerogear.unifiedpush.Client;
-import org.jboss.aerogear.unifiedpush.DefaultJavaSender;
-import org.jboss.aerogear.unifiedpush.JavaSender;
-import org.jboss.aerogear.unifiedpush.async.AsyncClient;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.Credentials;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
@@ -67,7 +69,8 @@ public class BlogResource {
         if (authorization != null && authorization.startsWith("Basic")) {
             // Authorization: Basic base64credentials
             String base64Credentials = authorization.substring("Basic".length()).trim();
-            String credentials = new String(DatatypeConverter.parseBase64Binary(base64Credentials) , Charset.forName("UTF-8"));
+            String credentials = new String(DatatypeConverter.parseBase64Binary(base64Credentials),
+                    Charset.forName("UTF-8"));
             // credentials = username:password
             final String[] values = credentials.split(":", 2);
             String username = values[0];
@@ -82,19 +85,38 @@ public class BlogResource {
             DBCollection collection = db.getCollection("blogs");
             collection.save(basicDBObjectBuilder.get());
             
-            Client client = new AsyncClient();
-            JavaSender sender  = new DefaultJavaSender("http://aerogear-shekhargulati.rhcloud.com/", client);
-            
-            String pushApplicationID = "bf8de351-39b9-455c-8725-1cf32703975d";
-            String masterSecret = "716a5ce3-c82f-4e41-a83a-3006332b635d";
-            Map<String, String> json = new HashMap<>();
-            json.put("alert", "New blog published in 30technologies30days challenge");
-            sender.broadcast(json , pushApplicationID, masterSecret);
+            try {
+                sendMessage();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             return Response.created(null).build();
 
         }
 
         return Response.status(Status.UNAUTHORIZED).build();
 
+    }
+
+    private String sendMessage() throws Exception{
+
+        HttpPost httpPost = new HttpPost("http://aerogear-shekhargulati.rhcloud.com/rest/sender");
+        httpPost.addHeader("Content-Type", "application/json");
+        httpPost.setEntity(new StringEntity("{'message':{'alert':'New blog published'}}"));
+        
+        DefaultHttpClient httpClient = new DefaultHttpClient();
+        
+        Credentials credentials = new UsernamePasswordCredentials("bf8de351-39b9-455c-8725-1cf32703975d","716a5ce3-c82f-4e41-a83a-3006332b635d");
+        httpClient.getCredentialsProvider().setCredentials(AuthScope.ANY, credentials);
+        
+        org.apache.http.HttpResponse httpResponse = httpClient.execute(httpPost);
+
+        // Start request
+        try {
+            return EntityUtils.toString(httpResponse.getEntity());
+        } catch (IOException e) {
+            // Log warning
+            return null;
+        }
     }
 }
