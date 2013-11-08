@@ -1,5 +1,6 @@
 package com.shekhar.challenge.rest;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
@@ -17,6 +18,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.xml.bind.DatatypeConverter;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
@@ -54,16 +56,16 @@ public class BlogResource {
         BasicDBObjectBuilder basicDBObjectBuilder = BasicDBObjectBuilder.start("title", blog.getTitle())
                 .add("url", blog.getUrl()).add("publishedOn", blog.getPublishedOn());
 
-        String authHeader = request.getHeader("authorization");
-        System.out.println("user header " + authHeader);
-        Enumeration<String> headerNames = request.getHeaderNames();
-        while(headerNames.hasMoreElements()){
-            System.out.println(headerNames.nextElement());
-        }
-        if (authHeader != null) {
-            String[] arr = authHeader.split(":");
-            String username = arr[0];
-            String password = arr[1];
+        String authorization = request.getHeader("authorization");
+
+        if (authorization != null && authorization.startsWith("Basic")) {
+            // Authorization: Basic base64credentials
+            String base64Credentials = authorization.substring("Basic".length()).trim();
+            String credentials = new String(DatatypeConverter.parseBase64Binary(base64Credentials) , Charset.forName("UTF-8"));
+            // credentials = username:password
+            final String[] values = credentials.split(":", 2);
+            String username = values[0];
+            String password = values[1];
             DBCollection users = db.getCollection("users");
             DBObject findOne = users.findOne(BasicDBObjectBuilder.start("username", username).add("password", password)
                     .get());
@@ -74,6 +76,7 @@ public class BlogResource {
             DBCollection collection = db.getCollection("blogs");
             collection.save(basicDBObjectBuilder.get());
             return Response.created(null).build();
+
         }
 
         return Response.status(Status.UNAUTHORIZED).build();
